@@ -1,0 +1,1 @@
+CREATE INDEX `idx_play_sessions_started_id_user` ON `play_sessions` (`started_at`,`id`,`user_id`);

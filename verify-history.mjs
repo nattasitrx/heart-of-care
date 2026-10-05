@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { DatabaseSync } from 'node:sqlite';
+import { createRequire } from 'node:module';
+const require=createRequire(import.meta.url),D=require('./dist/mentor.js'),{CareGame}=require('./dist/engine.js'),{History,csv}=require('./dist/history.js');
+const worker=(await import('data:text/javascript;base64,'+fs.readFileSync('dist/server/index.js').toString('base64'))).default;
+const sqlite=new DatabaseSync(':memory:');sqlite.exec(fs.readFileSync('drizzle/0000_moaning_butterfly.sql','utf8'));
+const DB={prepare(sql){const q=sqlite.prepare(sql);return{bind(...args){return{async run(){return q.run(...args);},async all(){return{results:q.all(...args)};}};}};}};
+let checks=0;const check=(condition,label)=>{assert.ok(condition,label);checks++;};
+const request=(method='GET',session=null,user='alice',query='',headers={})=>new Request('https://game.example/api/history'+query,{method,headers:{...(user?{'oai-authenticated-user-id':user}:{}),...headers,...(session?{'Content-Type':'application/json'}:{})},...(session?{body:JSON.stringify(session)}:{})});
+const env={DB},prefs={name:'ออม =safe',lang:'th',look:1,outfit:2,pace:25};
+const game=new CareGame(D),history=new History();history.start(prefs);game.start();history.capture(game,prefs,[]);game.tick(3);game.choose(0);history.capture(game,prefs,[0,1,2]);const partial=JSON.parse(JSON.stringify(history.current));
+check((await (await worker.fetch(request('GET',null,null),env)).json()).sessions.length===0,'Unregistered browser sees no private history');
+check((await worker.fetch(request('POST',partial),env)).status===200,'Partial run saved');
+let reply=await (await worker.fetch(request(),env)).json();check(reply.sessions.length===1&&reply.sessions[0].answers.length===1,'Saved partial run is readable');
+check(reply.sessions[0].answers[0].elapsedSeconds===3,'Active reply duration preserved');check(reply.sessions[0].answers[0].emotion==='smile','Immediate expression captured');
+reply=await (await worker.fetch(request('GET',null,'bob'),env)).json();check(reply.sessions.length===0,'Another user cannot read this history');
+while(game.state.phase!=='ending'){if(game.state.phase==='feedback')game.next();else{game.choose(game.node().options.findIndex(o=>o.correctness===2));history.capture(game,prefs,[0,1,2]);}}
+history.capture(game,prefs,[]);const complete=JSON.parse(JSON.stringify(history.current));
+check(complete.answers.length===33&&complete.result.knowledge.correct===12,'Complete log contains clinical and academic replies');
+check((await worker.fetch(request('POST',complete),env)).status===200,'Completed run saved');
+await worker.fetch(request('POST',partial),env);reply=await (await worker.fetch(request(),env)).json();check(reply.sessions[0].status==='completed'&&reply.sessions[0].answers.length===33,'Stale save cannot overwrite completed results');
+const duplicate=await worker.fetch(request('POST',complete),env);check(duplicate.status===200,'Retry is idempotent');
+const malformed={...partial,answers:[{nodeId:'broken'}]};check((await worker.fetch(request('POST',malformed),env)).status===400,'Malformed nested answer is rejected');
+check((await worker.fetch(request('POST',partial,'alice','',{'Origin':'https://other.example'}),env)).status===403,'Cross-origin write rejected');
+check((await worker.fetch(request('GET',null,'alice','?cursor=bad'),env)).status===400,'Malformed pagination cursor rejected');
+check((await worker.fetch(request(),{})).status===503,'Unavailable database is recoverable');
+for(let i=0;i<55;i++)await worker.fetch(request('POST',{...partial,id:'extra-run-'+String(i).padStart(3,'0')}),env);
+const ids=[];let cursor=null;do{reply=await (await worker.fetch(request('GET',null,'alice',cursor?'?cursor='+encodeURIComponent(cursor):''),env)).json();ids.push(...reply.sessions.map(s=>s.id));cursor=reply.nextCursor;}while(cursor);
+check(ids.length===56&&new Set(ids).size===56,'Pagination handles equal start timestamps without losing runs');
+const text=csv([complete]);check(text.startsWith('\uFEFF'),'Excel CSV uses UTF-8 BOM');check(text.split('\r\n').length===34,'CSV contains every reply');check(text.includes('elapsed_seconds')&&text.includes('selected_answer')&&text.includes('emotion'),'Export contains timing, choices, and feelings');
+const formula={...partial,name:'=HYPERLINK("x")',answers:[{...partial.answers[0],choice:'Text, "quote"\nnew line'}]};const safeCSV=csv([formula]);check(safeCSV.includes("'=HYPERLINK"),'Spreadsheet formulas in text are neutralized');check(safeCSV.includes('Text, ""quote""\nnew line'),'CSV preserves commas, quotes, and newlines');
+for(const path of ['/', '/history.js','/assets/doctor-surprise.webp']){const r=await worker.fetch(new Request('https://game.example'+path),env);check(r.status===200,'Worker serves '+path);check(r.headers.get('Content-Type')!==null,'Asset has MIME type');}
+const r=await worker.fetch(new Request('https://game.example/'),env);check((await r.text()).includes('history-dialog'),'Published HTML includes history UI');
+sqlite.close();console.log(JSON.stringify({status:'passed',checks,verified:['D1 SQLite schema and real queries','account isolation','partial and complete logs','stale-save protection','pagination','CSV escaping and full export','asset-serving Worker']},null,2));

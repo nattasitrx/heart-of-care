@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1790829188471,
+      "tag": "0000_moaning_butterfly",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1790832279307,
+      "tag": "0001_awesome_onslaught",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1790833729478,
+      "tag": "0002_perpetual_wolf_cub",
+      "breakpoints": true
+    }
+  ]
+}

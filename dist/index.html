@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#176d80">
+  <meta name="description" content="Heart of Care — an anime visual novel for a new pharmacist. Meet your preceptor, make timed clinical choices, then explore 12 pharmacology questions with evidence-based feedback. Thai, Traditional Chinese, and English.">
+  <title>Heart of Care · Pharmacist Stories</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23176d80'/%3E%3Cpath d='M18 28h10V18h8v10h10v8H36v10h-8V36H18z' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script src="story.js" defer></script>
+  <script src="mentor.js" defer></script>
+  <script src="engine.js" defer></script>
+  <script src="history.js" defer></script>
+  <script src="admin-access.js" defer></script>
+  <script src="audio.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" id="brand-home" aria-label="Heart of Care"><span class="brand-mark" aria-hidden="true">✚</span><span>HEART <span class="brand-small">of</span> CARE<small data-i18n="brandSub">เรื่องเล่าของเภสัชกร</small></span></a>
+      <div class="toolbar">
+        <button class="tool-btn" id="music-toggle" type="button" aria-pressed="true">♪ ดนตรี: เปิด</button>
+        <button class="tool-btn" id="effects-toggle" type="button" aria-pressed="true">♫ เอฟเฟกต์: เปิด</button>
+        <label class="text-size-control"><span data-i18n="textSize">ขนาดตัวอักษร</span><select id="text-size"><option value="100">100%</option><option value="125">125%</option><option value="150">150%</option><option value="175">175%</option><option value="200">200%</option></select></label>
+        <label class="language-control"><span aria-hidden="true">文</span><span class="sr-only" data-i18n="language">ภาษา</span><select id="language" aria-label="Language"><option value="th">ไทย</option><option value="zh">繁體中文</option><option value="en">English</option></select></label>
+        <button class="tool-btn" id="wardrobe-open"><span aria-hidden="true">✧</span><span data-i18n="wardrobe">แต่งตัว</span></button>
+        <button class="tool-btn" id="notes-open"><span aria-hidden="true">▤</span><span data-i18n="caseFile">แฟ้มเคส</span></button>
+        <button class="tool-btn" id="history-open" aria-label="ประวัติการเล่น"><span aria-hidden="true">↺</span><span data-i18n="history">ประวัติ</span></button>
+        <button class="tool-btn" id="admin-open"><span aria-hidden="true">⚿</span><span data-i18n="adminAccess">สำหรับอาจารย์</span></button>
+        <button class="icon-btn" id="pause-button" aria-label="Pause" hidden><span aria-hidden="true">Ⅱ</span></button>
+      </div>
+    </header>
+    <main id="game" class="game-shell">
+      <aside class="sidebar">
+        <div class="shift-label"><span class="mini-cross" aria-hidden="true">✚</span><span data-i18n="yourShift">เวรของคุณ</span><span id="shift-clock">08:40</span></div>
+        <div class="player-card"><div id="player-mini" class="player-sprite mini-portrait" role="img" aria-label="Your pharmacist"></div><div><small data-i18n="role">เภสัชกรน้องใหม่</small><strong id="player-name-display">ออม</strong><span class="tiny-label" data-i18n="unit">ทีมดูแลการกลืน</span></div></div>
+        <div class="patient-card"><div class="patient-initial" aria-hidden="true">林</div><div><strong data-i18n="patientName">คุณหลิน</strong><p data-i18n="patientAge">76 ปี · Alzheimer's</p></div><div class="patient-tag" data-i18n="patientTag">กลืนลำบาก</div></div>
+        <div class="section-label" data-i18n="chapterList">เส้นทางวันนี้</div>
+        <ol class="chapters" id="chapters"></ol>
+        <div class="safety-card"><div><span aria-hidden="true">✚</span><span data-i18n="safety">ความปลอดภัย</span><strong id="safety-value">50</strong></div><div class="track"><span id="safety-fill"></span></div><p data-i18n="safetyHint">คำตอบที่ดีดูแลทั้งคนและเคส</p></div>
+        <div class="knowledge-card" id="knowledge-card" hidden><div><span data-i18n="knowledge">ความเข้าใจเรื่องยา</span><strong id="knowledge-value">0 / 12</strong></div><div class="track"><span id="knowledge-fill"></span></div><p id="knowledge-progress"></p></div>
+        <button class="subtle-button" id="reference-open" data-i18n="references">ที่มาและบันทึกการปรับเคส</button>
+        <span class="sidebar-note" data-i18n="educational">เคสสมมติสำหรับการเรียนรู้</span>
+      </aside>
+      <section class="stage" aria-label="Visual novel game">
+        <div class="scene-bg" aria-hidden="true"></div><div class="scene-shade" aria-hidden="true"></div>
+        <div class="scene-top"><div class="scene-chip"><span id="scene-index">01 / 07</span><span id="scene-title"></span></div><span class="location-chip" id="location"></span></div>
+        <div id="cast-sprite" class="cast-sprite" role="img" aria-label="Your pharmacist"></div>
+        <div id="mood-card" class="mood-card" hidden><div class="mood-name"><span id="mood-symbol" aria-hidden="true">♡</span><div><strong id="npc-name"></strong><span id="npc-mood"></span></div></div><div class="meter-label"><span data-i18n="trust">ความไว้วางใจ</span><span id="trust-value"></span></div><div class="track pink"><span id="trust-fill"></span></div><div class="meter-label"><span data-i18n="tension">ความกังวล</span><span id="stress-value"></span></div><div class="track gold"><span id="stress-fill"></span></div></div>
+        <section class="start-panel" id="start-panel">
+          <span class="episode-label" data-i18n="episode">EPISODE 01 · คำตอบที่อ่อนโยน</span>
+          <h1 data-i18n="startTitle">เวรแรก<br>ของหัวใจ</h1>
+          <p data-i18n="startDescription">คุณหลินมีปัญหาการกลืน แพทย์กำลังรีบ ลูกสาวกำลังกังวล คุณจะดูแลทั้งเคสและความรู้สึกของทุกคนอย่างไร?</p>
+          <label class="name-input"><span data-i18n="yourName">ชื่อที่ใช้ในเกม</span><input id="player-name-input" maxlength="100" required autocomplete="name"></label>
+          <div class="student-fields"><label class="name-input"><span data-i18n="studentCodeRequired">รหัสนักศึกษา</span><input id="student-code-input" maxlength="80" required autocomplete="off"></label><label class="name-input"><span data-i18n="studyGroup">กลุ่ม / ชั้นเรียน (ถ้ามี)</span><input id="study-group-input" maxlength="80" autocomplete="off"></label></div>
+          <p class="assessment-notice" data-i18n="assessmentNotice">อาจารย์เจ้าของเกมดูชื่อ บัญชี คำตอบ เวลาและคะแนนเพื่อทบทวนการเรียนรู้ได้</p>
+          <p id="account-message" role="status"></p><p class="modal-note" data-i18n="guestHistoryHint">ไม่ต้องมีบัญชี ChatGPT · ประวัติส่วนตัวจำผ่านเบราว์เซอร์นี้ การเปลี่ยนเครื่องหรือล้างคุกกี้อาจทำให้ไม่เห็นประวัติเดิม</p>
+          <div class="pace-label" data-i18n="pace">เวลาคิดในแต่ละคำตอบ</div><div class="pace-options" id="pace-options"></div>
+          <button class="primary-btn start-btn" id="start-game"><span data-i18n="start">เริ่มเวร</span><span aria-hidden="true">✦</span></button>
+          <div class="start-meta"><span data-i18n="duration">7 ฉาก · ประมาณ 15–20 นาที</span><span data-i18n="startHint">คลิกคำตอบ หรือกด 1 / 2 / 3</span></div>
+        </section>
+        <section id="dialogue-panel" class="dialogue-panel" hidden>
+          <div class="dialogue-heading"><span id="speaker-label" class="speaker-label"></span><div class="countdown" id="countdown"><span class="timer-icon" aria-hidden="true">◷</span><span id="seconds">25</span><span data-i18n="secondsLabel">วินาที</span></div></div>
+          <div id="timer-track" class="timer-track"><span id="timer-fill"></span></div>
+          <div class="academic-label" id="academic-label" hidden></div><p id="dialogue-text" class="dialogue-text"></p><p class="context-line" id="context-line"></p>
+          <div id="choices" class="choices"></div>
+          <div id="feedback" class="feedback" hidden aria-live="polite"><div class="feedback-reaction"><span id="feedback-symbol" aria-hidden="true">♡</span><p id="reaction-text"></p></div><div id="impact-chips" class="impact-chips"></div><details class="learning-details" id="learning-details"><summary data-i18n="why">บันทึกของเภสัชกร</summary><p id="learning-text"></p><div id="learning-sources"></div></details><button class="primary-btn" id="continue-button" data-i18n="continue">คุยต่อ</button></div>
+          <div class="dialogue-footer"><span id="decision-count"></span><span id="keyboard-hint" data-i18n="keyboardHint">1–3 เลือกคำตอบ · Enter คุยต่อ</span></div>
+        </section>
+        <section id="ending-panel" class="ending-panel" hidden></section>
+        <div id="pause-overlay" class="pause-overlay" hidden><span aria-hidden="true">☕</span><h2 data-i18n="paused">พักสักครู่</h2><p data-i18n="pauseHint">เวรนี้รอคุณได้ กลับมาเมื่อพร้อม</p><button class="primary-btn" id="resume-button" data-i18n="resume">กลับไปคุย</button></div>
+      </section>
+    </main>
+    <footer class="bottom-bar"><span>HEART OF CARE <span class="footer-dot">·</span> <span data-i18n="footerSub">เรียนรู้ผ่านการรับฟัง</span></span><span id="save-status" class="save-status" role="status"></span><span id="progress-label" data-i18n="ready">พร้อมสำหรับเวรแรก</span></footer>
+  </div>
+  <dialog id="wardrobe-dialog" class="modal wardrobe-modal"><div class="modal-head"><div><small data-i18n="wardrobeKicker">ก่อนออกเวร</small><h2 data-i18n="wardrobeTitle">ในแบบของคุณ</h2></div><button class="close-btn" data-close="wardrobe-dialog" aria-label="Close">×</button></div><div class="wardrobe-body"><div class="portrait-preview"><div id="player-preview" class="player-sprite"></div></div><div class="wardrobe-controls"><h3 data-i18n="appearance">หน้าตาตัวละคร</h3><div class="segmented" id="appearance-options"></div><h3 data-i18n="outfit">ชุดประจำเวร</h3><div class="outfit-options" id="outfit-options"></div><p class="modal-note" data-i18n="outfitHint">ทุกชุดมีทักษะเหมือนกัน เลือกแบบที่ชอบได้เลย</p><button class="primary-btn" data-close="wardrobe-dialog" data-i18n="wear">พร้อมออกเวร</button></div></div></dialog>
+  <dialog id="notes-dialog" class="modal notes-modal"><div class="modal-head"><div><small data-i18n="caseKicker">PATIENT FILE · 2601</small><h2 data-i18n="caseFile">แฟ้มเคส</h2></div><button class="close-btn" data-close="notes-dialog" aria-label="Close">×</button></div><div id="case-content"></div></dialog>
+  <dialog id="reference-dialog" class="modal notes-modal"><div class="modal-head"><div><small>HEART OF CARE</small><h2 data-i18n="references">ที่มาและบันทึกการปรับเคส</h2></div><button class="close-btn" data-close="reference-dialog" aria-label="Close">×</button></div><div id="reference-content"></div></dialog>
+  <div id="live-region" class="sr-only" aria-live="polite"></div>
+  <dialog id="history-dialog" class="modal history-modal"><div class="modal-head"><div><small>HEART OF CARE · PLAY LOG</small><h2 data-i18n="historyTitle">ประวัติการเล่น</h2></div><button class="close-btn" data-close="history-dialog" aria-label="Close">×</button></div><p class="history-note" data-i18n="historyNote">บันทึกกับบัญชีที่ใช้เปิดเกม แต่ละรอบมีประวัติคำตอบของตัวเอง</p><div class="history-actions"><button class="secondary-btn" id="history-refresh" data-i18n="refreshHistory">โหลดประวัติ / ลองบันทึกอีกครั้ง</button><div><span data-i18n="exportAll">ส่งออกทุกรอบ</span><button class="secondary-btn" data-export="all" data-format="csv">CSV</button><button class="secondary-btn" data-export="all" data-format="json">JSON</button></div></div><p id="history-message" role="status"></p><div class="history-layout"><div id="history-list" class="history-list"></div><section id="history-detail" class="history-detail"></section></div></dialog>
+  <dialog id="admin-dialog" class="modal admin-modal"><div class="modal-head"><h2 data-i18n="instructorDashboard">หน้าสำหรับอาจารย์</h2><div class="admin-dialog-actions"><button id="admin-logout" class="secondary-btn" hidden data-i18n="adminLogout">ออกจากระบบหลังบ้าน</button><button class="close-btn" data-close="admin-dialog" aria-label="Close">×</button></div></div><p id="admin-status" role="status"></p><form id="admin-login-form"><p class="modal-note" data-i18n="adminPasswordHint">เฉพาะผู้ได้รับรหัสผ่านจากอาจารย์ รหัสนี้เปิดดูผลผู้เล่นทุกรายได้</p><label class="name-input"><span data-i18n="adminPassword">รหัสผ่านหลังบ้าน</span><input id="admin-password" type="password" autocomplete="current-password" maxlength="256" required></label><button id="admin-login-button" type="submit" class="primary-btn" data-i18n="adminLogin">เปิดหลังบ้าน</button></form><iframe id="admin-frame" title="Instructor dashboard" hidden></iframe></dialog>
+</body>
+</html>

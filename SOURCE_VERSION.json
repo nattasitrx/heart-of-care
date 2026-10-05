@@ -1,0 +1,8 @@
+{
+  "exportDate": "2026-10-05",
+  "siteVersion": 10,
+  "sourceCommit": "5f492e01afe8d54e0006d9228151b24457166445",
+  "containsStudentData": false,
+  "containsRuntimeSecrets": false,
+  "deploymentConnectionIncluded": false
+}

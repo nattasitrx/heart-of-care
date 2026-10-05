@@ -1,0 +1,14 @@
+{
+  "name": "heart-of-care",
+  "private": true,
+  "version": "4.0.0",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "db:generate": "drizzle-kit generate",
+    "test": "node verify.mjs"
+  },
+  "devDependencies": {
+    "drizzle-kit": "0.31.4",
+    "drizzle-orm": "0.44.5"
+  }
+}

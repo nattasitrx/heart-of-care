@@ -1,0 +1,11 @@
+{
+  "validatedOn": "2026-10-05",
+  "build": "passed",
+  "clinicalChecks": 21893,
+  "historyChecks": 27,
+  "adminChecks": 45,
+  "participantChecks": 16,
+  "validationRuntime": "Node.js 24 (local)",
+  "githubActionsConfigured": "Node.js 22; workflow added, not run on GitHub yet",
+  "liveWebsiteChanged": false
+}

@@ -1,0 +1,16 @@
+Heart of Care · Pharmacist Stories
+
+An educational, noncommercial adaptation of:
+Pharmacist Clinical Training Simulator – Swallowing Difficulties in a Patient with Alzheimer’s Disease
+Original author: Huu Hiep Tran
+Affiliation: Professor 陳崇鈺 Research Team, Kaohsiung Medical University
+Original URL: https://pharmahht.github.io/Dysphagia2601/
+
+The original teaching case is licensed Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0).
+This adaptation is distributed under the same license:
+https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+Attribution example:
+Heart of Care · Pharmacist Stories, an adaptation of the Dysphagia teaching case by Huu Hiep Tran, Professor 陳崇鈺 Research Team, Kaohsiung Medical University (https://pharmahht.github.io/Dysphagia2601/), CC BY-NC-SA 4.0. Changes: new fictional dialogue and characters, anime artwork, timed decisions, emotional mechanics, multilingual localization, and revised medication explanations.
+
+Use and share noncommercially with attribution and indication of changes. Adaptations must use the same license. No endorsement by the original authors or university is implied. The game’s scores and clinical explanations are not a validated clinical decision-support or assessment instrument.
